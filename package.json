@@ -1,8 +1,9 @@
 {
   "name": "slim-image",
-  "version": "1.0.0",
+  "productName": "Slim Image",
+  "version": "0.1.0",
   "main": "./out/main/index.js",
-  "author": "Christian De Zan Martinez",
+  "author": "The Slim Image Team",
   "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",

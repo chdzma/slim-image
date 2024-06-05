@@ -1,33 +1,33 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
-import { useEffect } from 'react';
+import * as React from 'react'
+import Box from '@mui/material/Box'
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar'
+import { useEffect } from 'react'
 
 interface State extends SnackbarOrigin {
-  open: boolean;
+  open: boolean
 }
 
 type CustomSnackbarProps = {
-    message: string;
-    visible: boolean;
+  message: string
+  visible: boolean
 }
 
-export default function CustomSnackbar({message, visible}: CustomSnackbarProps) {
+export default function CustomSnackbar({ message, visible }: CustomSnackbarProps) {
   const [state, setState] = React.useState<State>({
     open: false,
     vertical: 'bottom',
-    horizontal: 'right',
-  });
+    horizontal: 'right'
+  })
 
-  const { vertical, horizontal, open } = state;
-  
+  const { vertical, horizontal, open } = state
+
   useEffect(() => {
-    setState({ ...state, open: visible });
-  }, [visible]);
+    setState({ ...state, open: visible })
+  }, [visible])
 
   const handleClose = () => {
-    setState({ ...state, open: false });
-  };
+    setState({ ...state, open: false })
+  }
 
   return (
     <Box sx={{ width: 500 }}>
@@ -39,5 +39,5 @@ export default function CustomSnackbar({message, visible}: CustomSnackbarProps) 
         key={vertical + horizontal}
       />
     </Box>
-  );
+  )
 }

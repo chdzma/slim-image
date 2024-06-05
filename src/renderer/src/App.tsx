@@ -14,7 +14,7 @@ function App(): JSX.Element {
         .then((config: Config) => {
           dispatch(setConfig(config))
         })
-        .catch((error: any) => {
+        .catch((error: Error) => {
           console.error('Error fetching config:', error)
         })
     }

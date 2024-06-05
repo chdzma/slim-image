@@ -1,40 +1,40 @@
 // configSlice.ts
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Config } from "../../helper/config";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Config } from '../../helper/config'
 
 interface ConfigState {
-  config: Config;
-  loading: boolean;
-  error: string | null;
+  config: Config
+  loading: boolean
+  error: string | null
 }
 
 const initialState: ConfigState = {
   config: {
-    tinypngKey: "",
+    tinypngKey: '',
     replaceImage: false,
     convertToWebp: false,
     convertToPng: false,
-    convertToJpg: false,
+    convertToJpg: false
   },
   loading: false,
-  error: null,
-};
+  error: null
+}
 
 const configSlice = createSlice({
-  name: "config",
+  name: 'config',
   initialState,
   reducers: {
     setConfig(state, action: PayloadAction<Config>) {
-      state.config = action.payload;
+      state.config = action.payload
     },
     setLoading(state, action: PayloadAction<boolean>) {
-      state.loading = action.payload;
+      state.loading = action.payload
     },
     setError(state, action: PayloadAction<string | null>) {
-      state.error = action.payload;
-    },
-  },
-});
+      state.error = action.payload
+    }
+  }
+})
 
-export const { setConfig, setLoading, setError } = configSlice.actions;
-export default configSlice.reducer;
+export const { setConfig, setLoading, setError } = configSlice.actions
+export default configSlice.reducer

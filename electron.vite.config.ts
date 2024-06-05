@@ -7,9 +7,7 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     build: {
       rollupOptions: {
-        external: [
-          "sharp"
-        ]
+        external: ['sharp']
       }
     }
   },

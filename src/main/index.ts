@@ -2,11 +2,10 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { readConfig, saveConfig } from "./config";
-import axios from "axios";
-import fs from "fs";
-import sharp from "sharp";
-
+import { readConfig, saveConfig } from './config'
+import axios from 'axios'
+import fs from 'fs'
+import sharp from 'sharp'
 
 function createWindow(): void {
   // Create the browser window.
@@ -55,44 +54,42 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.handle("request", async (event, axiosRequest) => {
+  ipcMain.handle('request', async (_event, axiosRequest) => {
     try {
-      const result = await axios(axiosRequest);
-      return { data: result.data, status: result.status };
+      const result = await axios(axiosRequest)
+      return { data: result.data, status: result.status }
     } catch (error) {
-      return { error: error };
+      return { error: error }
     }
-  });
+  })
 
-  ipcMain.handle("save-file", async (_, { filePath, data }) => {
+  ipcMain.handle('save-file', async (_, { filePath, data }) => {
     try {
-      fs.writeFileSync(filePath, Buffer.from(data));
-      return { success: true };
+      fs.writeFileSync(filePath, Buffer.from(data))
+      return { success: true }
     } catch (err) {
-      return { success: false, error: err };
+      return { success: false, error: err }
     }
-  });
+  })
 
-  ipcMain.handle("get-config", () => {
-    return readConfig();
-  });
+  ipcMain.handle('get-config', () => {
+    return readConfig()
+  })
 
-  ipcMain.on("set-config", (event, config) => {
-    saveConfig(config);
-  });
+  ipcMain.on('set-config', (_event, config) => {
+    saveConfig(config)
+  })
 
-  ipcMain.handle('convert-image', async (event, { fileBuffer, format, outputFileName }) => {
+  ipcMain.handle('convert-image', async (_event, { fileBuffer, format, outputFileName }) => {
     try {
-      console.log(outputFileName);
-      await sharp(fileBuffer)
-        .toFormat(format)
-        .toFile(outputFileName);
-      return outputFileName;
+      console.log(outputFileName)
+      await sharp(fileBuffer).toFormat(format).toFile(outputFileName)
+      return outputFileName
     } catch (error) {
-      console.error(error);
-      throw error;
+      console.error(error)
+      throw error
     }
-  });
+  })
 
   createWindow()
 

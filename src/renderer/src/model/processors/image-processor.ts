@@ -1,18 +1,18 @@
-import { AbstractImageProcessor } from "../../interfaces/image-processor.abstract";
+import { AbstractImageProcessor } from '../../interfaces/image-processor.abstract'
 
 class ImageProcessor {
-  private processors: AbstractImageProcessor[];
+  private processors: AbstractImageProcessor[]
 
   constructor(processors: AbstractImageProcessor[]) {
-    this.processors = processors;
+    this.processors = processors
   }
 
   async run(file: File) {
     for (let index = 0; index < this.processors.length; index++) {
-      const processor = this.processors[index];
-      await processor.process(file);
+      const processor = this.processors[index]
+      await processor.process(file)
     }
   }
 }
 
-export default ImageProcessor;
+export default ImageProcessor

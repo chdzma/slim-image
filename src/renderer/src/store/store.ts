@@ -1,11 +1,11 @@
 // store.ts
-import { configureStore } from '@reduxjs/toolkit';
-import configReducer from './reducers/configSlice';
+import { configureStore } from '@reduxjs/toolkit'
+import configReducer from './reducers/configSlice'
 
 const store = configureStore({
   reducer: {
-    config: configReducer,
-  },
-});
+    config: configReducer
+  }
+})
 
-export default store;
+export default store
