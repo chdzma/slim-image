@@ -1,4 +1,4 @@
-name: Build/release Slim Image app
+name: Build/release Electron app
 
 on:
   push:
@@ -45,6 +45,9 @@ jobs:
             dist/*.exe
             dist/*.zip
             dist/*.dmg
+            dist/*.snap
             dist/*.deb
             dist/*.rpm
             dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
