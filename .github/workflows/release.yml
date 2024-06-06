@@ -1,103 +1,34 @@
-name: Release
+name: Build/release
 
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - v*.*.*
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Check out Git repository
+        uses: actions/checkout@v1
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: 10
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build application
-        run: npm run build
-
-      - name: Install electron-builder
-        run: npm install electron-builder --save-dev
-
-      - name: Build Electron app
-        run: npm run electron:build -- --${{ matrix.os }}
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
         with:
-          name: build-${{ matrix.os }}
-          path: dist/
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
 
-  release:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-ubuntu-latest
-          path: ./dist/linux
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-macos-latest
-          path: ./dist/mac
-      - uses: actions/download-artifact@v3
-        with:
-          name: build-windows-latest
-          path: ./dist/win
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Linux Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/linux/*.AppImage
-          asset_name: app-${{ github.ref }}-linux.AppImage
-          asset_content_type: application/octet-stream
-
-      - name: Upload macOS Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/mac/*.dmg
-          asset_name: app-${{ github.ref }}-mac.dmg
-          asset_content_type: application/octet-stream
-
-      - name: Upload Windows Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/win/*.exe
-          asset_name: app-${{ github.ref }}-windows.exe
-          asset_content_type: application/octet-stream
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
