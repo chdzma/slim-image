@@ -1,6 +1,6 @@
-# slim-image
+# Slim Image
 
-An Electron application with React and TypeScript
+An open-source Electron app designed to optimize and create image versions in WebP, PNG, and JPEG formats, using the TinyPNG service for efficient image compression.
 
 ## Recommended IDE Setup
 
