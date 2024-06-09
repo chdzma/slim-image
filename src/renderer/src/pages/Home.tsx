@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Divider, Grid, Link, Stack } from '@mui/material'
+import { Chip, Divider, Grid, Link, Stack, Typography } from '@mui/material'
 import { useSelector } from 'react-redux'
-import { v4 as uuidv4 } from 'uuid' // Importar uuid para generar IDs únicos
+import { v4 as uuidv4 } from 'uuid'
 import { RootState } from '../store/reducers'
 import { Layout } from '../layout/Layout'
 import UploadFileContainer from '../components/UploadFileContainer'
@@ -19,6 +19,7 @@ import ImageProcessor from '../model/processors/image-processor'
 
 export const Home = () => {
   const config = useSelector((state: RootState) => state.config.config)
+  const compressions = useSelector((state: RootState) => state.imgService.compressions)
   const [selectedFiles, setSelectedFiles] = useState<FileProcess[]>([])
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false)
   const [showSettings, setShowSettings] = useState<boolean>(false)
@@ -26,7 +27,7 @@ export const Home = () => {
   const handleFilesUploaded = (files: File[]) => {
     setSelectedFiles((prevFiles) => [
       ...files.map((file) => ({
-        id: uuidv4(), // Asignar un ID único a cada archivo
+        id: uuidv4(),
         file: file,
         status: FileProcessStatus.pending
       })),
@@ -88,7 +89,9 @@ export const Home = () => {
 
   return (
     <Layout>
-      <Stack direction={'row'} mb={3} justifyContent={'flex-end'}>
+      <Stack direction={'row'} mb={3} justifyContent={'space-between'}>
+      <Chip label={`Compressions this month: ${compressions} images`} component="a" />
+
         <Link
           component={'button'}
           onClick={() => {

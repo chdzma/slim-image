@@ -57,7 +57,7 @@ app.whenReady().then(() => {
   ipcMain.handle('request', async (_event, axiosRequest) => {
     try {
       const result = await axios(axiosRequest)
-      return { data: result.data, status: result.status }
+      return { data: result.data, status: result.status, headers: result.headers }
     } catch (error) {
       return { error: error }
     }

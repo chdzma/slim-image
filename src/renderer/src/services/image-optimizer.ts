@@ -1,3 +1,6 @@
+import store from '@renderer/store/store';
+import { setData } from '../store/reducers/imgServiceSlice';
+
 class ImageOptimizer {
   private apiKey: string
   private replaceImage: boolean
@@ -32,6 +35,10 @@ class ImageOptimizer {
     return window.electron.ipcRenderer.invoke('request', {
       method: 'GET',
       url,
+      headers: {
+        Authorization: `Basic ${btoa(`api:${this.apiKey}`)}`,
+        'Content-Type': 'application/octet-stream'
+      },
       responseType: 'arraybuffer'
     })
   }
@@ -54,6 +61,7 @@ class ImageOptimizer {
         return this.uploadImage(imageData)
       })
       .then((uploadResponse) => {
+        store.dispatch(setData({compressions: uploadResponse.headers['compression-count']}));
         if (uploadResponse.data.output && uploadResponse.data.output.url) {
           return this.downloadOptimizedImage(uploadResponse.data.output.url)
         } else {
