@@ -19,10 +19,9 @@ export default function ImageCard({ file }: ImageCardProps) {
         mt={2}
         mb={2}
       >
-        <Stack spacing={1} direction="row">
+        <Stack spacing={3} direction="row">
           <img
-            width={50}
-            height={50}
+            width={55}
             src={URL.createObjectURL(
               file.status === FileProcessStatus.processed && file.optimizedFile
                 ? file.optimizedFile
@@ -30,10 +29,10 @@ export default function ImageCard({ file }: ImageCardProps) {
             )}
           />
           <Stack>
-            <Typography variant="body2" className="text-white">
+            <Typography variant="body2">
               {file.file.path}
             </Typography>
-            <Typography variant="body2" className="text-white">
+            <Typography variant="body2">
               {formatBytes(file.file.size)}{' '}
               {file.optimizedSize && `"-${formatBytes(file.file.size - file.optimizedSize)}"`}
             </Typography>
