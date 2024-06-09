@@ -5,6 +5,7 @@ export enum FileProcessStatus {
 }
 
 export interface FileProcess {
+  id: string;
   file: File
   optimizedFile?: File
   status: FileProcessStatus

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Divider, Grid, Link, Stack } from '@mui/material'
 import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid' // Importar uuid para generar IDs únicos
 import { RootState } from '../store/reducers'
 import { Layout } from '../layout/Layout'
 import UploadFileContainer from '../components/UploadFileContainer'
@@ -25,6 +26,7 @@ export const Home = () => {
   const handleFilesUploaded = (files: File[]) => {
     setSelectedFiles((prevFiles) => [
       ...files.map((file) => ({
+        id: uuidv4(), // Asignar un ID único a cada archivo
         file: file,
         status: FileProcessStatus.pending
       })),
@@ -33,11 +35,6 @@ export const Home = () => {
   }
 
   const optimize = () => {
-    if (!config.tinypngKey) {
-      setSnackbarVisible(true)
-      return
-    }
-
     const processors: AbstractImageProcessor[] = []
     if (config.convertToJpg) {
       processors.push(new JpegImageProcessor())
@@ -52,34 +49,41 @@ export const Home = () => {
     }
 
     const imageProcessor = new ImageProcessor(processors)
-
     const imageOptimizer = new ImageOptimizer(config.tinypngKey, config.replaceImage)
 
-    const processFile = (file: FileProcess, index: number) => {
-      setSelectedFiles((prevFiles) => {
-        const updatedFiles = [...prevFiles]
-        updatedFiles[index].status = FileProcessStatus.processing
-        return updatedFiles
-      })
+    const processFile = (file: FileProcess) => {
+      setSelectedFiles((prevFiles) =>
+        prevFiles.map((f) =>
+          f.id === file.id ? { ...f, status: FileProcessStatus.processing } : f
+        )
+      )
+
       imageOptimizer.optimizeImage(file.file, async (optimizedFile: File, size: number) => {
         await imageProcessor.run(optimizedFile)
-        setSelectedFiles((prevFiles) => {
-          const updatedFiles = [...prevFiles]
-          updatedFiles[index].status = FileProcessStatus.processed
-          updatedFiles[index].optimizedSize = size
-          updatedFiles[index].optimizedFile = optimizedFile
-          return updatedFiles
-        })
+        setSelectedFiles((prevFiles) =>
+          prevFiles.map((f) =>
+            f.id === file.id
+              ? {
+                  ...f,
+                  status: FileProcessStatus.processed,
+                  optimizedSize: size,
+                  optimizedFile: optimizedFile
+                }
+              : f
+          )
+        )
       })
     }
 
     selectedFiles
       .filter((file) => file.status === FileProcessStatus.pending)
-      .forEach((item, index) => processFile(item, index))
+      .forEach((file) => processFile(file))
   }
 
   useEffect(() => {
-    optimize()
+    if (selectedFiles.length > 0) {
+      optimize()
+    }
   }, [selectedFiles.length])
 
   return (
@@ -100,8 +104,8 @@ export const Home = () => {
           <Stack spacing={4}>
             <UploadFileContainer handleFilesUploaded={handleFilesUploaded} />
             <Stack divider={<Divider orientation="horizontal" flexItem />}>
-              {selectedFiles.map((file, index) => (
-                <ImageCard key={index} file={file} />
+              {selectedFiles.map((file) => (
+                <ImageCard key={file.id} file={file} />
               ))}
             </Stack>
           </Stack>

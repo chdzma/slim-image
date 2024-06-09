@@ -1,14 +1,22 @@
-import { Typography, Stack, CircularProgress } from '@mui/material'
-import { FileProcess, FileProcessStatus } from '../interfaces/file-process.interface'
-import { formatBytes } from '../helper/global'
-import PendingRoundedIcon from '@mui/icons-material/PendingRounded'
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import { useMemo } from 'react';
+import { Typography, Stack, CircularProgress } from '@mui/material';
+import { FileProcess, FileProcessStatus } from '../interfaces/file-process.interface';
+import { formatBytes } from '../helper/global';
+import PendingRoundedIcon from '@mui/icons-material/PendingRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
 interface ImageCardProps {
-  file: FileProcess
+  file: FileProcess;
 }
 
 export default function ImageCard({ file }: ImageCardProps) {
+  const imageSrc = useMemo(() => {
+    if (file.status === FileProcessStatus.processed && file.optimizedFile) {
+      return URL.createObjectURL(file.optimizedFile);
+    }
+    return URL.createObjectURL(file.file);
+  }, [file]);
+
   return (
     <div>
       <Stack
@@ -18,20 +26,13 @@ export default function ImageCard({ file }: ImageCardProps) {
         spacing={1}
         mt={2}
         mb={2}
+        mr={2}
+        ml={2}
       >
         <Stack spacing={3} direction="row">
-          <img
-            width={55}
-            src={URL.createObjectURL(
-              file.status === FileProcessStatus.processed && file.optimizedFile
-                ? file.optimizedFile
-                : file.file
-            )}
-          />
+          <img width={55} src={imageSrc} alt={file.file.name} />
           <Stack>
-            <Typography variant="body2">
-              {file.file.path}
-            </Typography>
+            <Typography variant="body2">{file.file.path}</Typography>
             <Typography variant="body2">
               {formatBytes(file.file.size)}{' '}
               {file.optimizedSize && `"-${formatBytes(file.file.size - file.optimizedSize)}"`}
@@ -42,11 +43,9 @@ export default function ImageCard({ file }: ImageCardProps) {
         <div>
           {file.status === FileProcessStatus.pending && <PendingRoundedIcon />}
           {file.status === FileProcessStatus.processing && <CircularProgress />}
-          {file.status === FileProcessStatus.processed && (
-            <CheckCircleRoundedIcon color="success" />
-          )}
+          {file.status === FileProcessStatus.processed && <CheckCircleRoundedIcon color="success" />}
         </div>
       </Stack>
     </div>
-  )
+  );
 }
