@@ -1,11 +1,12 @@
 export enum FileProcessStatus {
   pending = 'pending',
   processed = 'pocessed',
-  processing = 'processing'
+  processing = 'processing',
+  error = 'error'
 }
 
 export interface FileProcess {
-  id: string;
+  id: string
   file: File
   optimizedFile?: File
   status: FileProcessStatus

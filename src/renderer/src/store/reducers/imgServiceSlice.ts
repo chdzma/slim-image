@@ -1,25 +1,25 @@
 // En un archivo llamado ImageServiceSlice.ts
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface ImageServiceData {
-    compressions: number;
+  compressions: number
 }
 
 const initialState: ImageServiceData = {
-    compressions: 0,
-};
+  compressions: 0
+}
 
 const imageServiceSlice = createSlice({
   name: 'imageService',
   initialState,
   reducers: {
     setData: (state, action: PayloadAction<ImageServiceData>) => {
-      state.compressions = action.payload.compressions;
-    },
-  },
-});
+      state.compressions = action.payload.compressions
+    }
+  }
+})
 
-export const { setData } = imageServiceSlice.actions;
+export const { setData } = imageServiceSlice.actions
 
-export default imageServiceSlice.reducer;
+export default imageServiceSlice.reducer

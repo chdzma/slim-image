@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Chip, Divider, Grid, Link, Stack, Typography } from '@mui/material'
+import { Chip, Divider, Grid, Link, Stack } from '@mui/material'
 import { useSelector } from 'react-redux'
 import { v4 as uuidv4 } from 'uuid'
 import { RootState } from '../store/reducers'
@@ -36,6 +36,10 @@ export const Home = () => {
   }
 
   const optimize = () => {
+    if (!config.tinypngKey) {
+      setSnackbarVisible(true)
+    }
+
     const processors: AbstractImageProcessor[] = []
     if (config.convertToJpg) {
       processors.push(new JpegImageProcessor())
@@ -59,21 +63,36 @@ export const Home = () => {
         )
       )
 
-      imageOptimizer.optimizeImage(file.file, async (optimizedFile: File, size: number) => {
-        await imageProcessor.run(optimizedFile)
-        setSelectedFiles((prevFiles) =>
-          prevFiles.map((f) =>
-            f.id === file.id
-              ? {
-                  ...f,
-                  status: FileProcessStatus.processed,
-                  optimizedSize: size,
-                  optimizedFile: optimizedFile
-                }
-              : f
+      imageOptimizer.optimizeImage(
+        file.file,
+        async (optimizedFile: File, size: number) => {
+          await imageProcessor.run(optimizedFile)
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id
+                ? {
+                    ...f,
+                    status: FileProcessStatus.processed,
+                    optimizedSize: size,
+                    optimizedFile: optimizedFile
+                  }
+                : f
+            )
           )
-        )
-      })
+        },
+        () => {
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id
+                ? {
+                    ...f,
+                    status: FileProcessStatus.error
+                  }
+                : f
+            )
+          )
+        }
+      )
     }
 
     selectedFiles
@@ -90,7 +109,7 @@ export const Home = () => {
   return (
     <Layout>
       <Stack direction={'row'} mb={3} justifyContent={'space-between'}>
-      <Chip label={`Compressions this month: ${compressions} images`} component="a" />
+        <Chip label={`Compressions this month: ${compressions} images`} component="a" />
 
         <Link
           component={'button'}

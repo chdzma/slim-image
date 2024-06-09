@@ -1,21 +1,22 @@
-import { useMemo } from 'react';
-import { Typography, Stack, CircularProgress } from '@mui/material';
-import { FileProcess, FileProcessStatus } from '../interfaces/file-process.interface';
-import { formatBytes } from '../helper/global';
-import PendingRoundedIcon from '@mui/icons-material/PendingRounded';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import { useMemo } from 'react'
+import { Typography, Stack, CircularProgress } from '@mui/material'
+import { FileProcess, FileProcessStatus } from '../interfaces/file-process.interface'
+import { formatBytes } from '../helper/global'
+import PendingRoundedIcon from '@mui/icons-material/PendingRounded'
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded'
+import ErrorIcon from '@mui/icons-material/Error'
 
 interface ImageCardProps {
-  file: FileProcess;
+  file: FileProcess
 }
 
 export default function ImageCard({ file }: ImageCardProps) {
   const imageSrc = useMemo(() => {
     if (file.status === FileProcessStatus.processed && file.optimizedFile) {
-      return URL.createObjectURL(file.optimizedFile);
+      return URL.createObjectURL(file.optimizedFile)
     }
-    return URL.createObjectURL(file.file);
-  }, [file]);
+    return URL.createObjectURL(file.file)
+  }, [file])
 
   return (
     <div>
@@ -43,9 +44,12 @@ export default function ImageCard({ file }: ImageCardProps) {
         <div>
           {file.status === FileProcessStatus.pending && <PendingRoundedIcon />}
           {file.status === FileProcessStatus.processing && <CircularProgress />}
-          {file.status === FileProcessStatus.processed && <CheckCircleRoundedIcon color="success" />}
+          {file.status === FileProcessStatus.processed && (
+            <CheckCircleRoundedIcon color="success" />
+          )}
+          {file.status === FileProcessStatus.error && <ErrorIcon color="error" />}
         </div>
       </Stack>
     </div>
-  );
+  )
 }
