@@ -17,5 +17,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm install
+      - run: npm install cross-env --save-dev
       - run: npm run build:test
       - run: npm run test
