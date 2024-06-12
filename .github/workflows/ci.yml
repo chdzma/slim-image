@@ -1,7 +1,10 @@
 name: ci
-on: [push,pull_request]
+
+on: [push, pull_request]
+
 permissions:
   contents: write
+
 jobs:
   test:
     name: Node ${{ matrix.node }} / ${{ matrix.os }}
@@ -15,10 +18,20 @@ jobs:
           - '16'
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install
-      - run: npm install cross-env --save-dev
-      - run: npm run build:test
-      - run: npm run test
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install cross-env --save-dev
+          npm install electron --save-dev
+
+      - name: Build the app
+        run: npm run build:test
+
+      - name: Run tests
+        run: npm run test
