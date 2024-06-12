@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Button, Divider, Grid, Link, Stack } from '@mui/material'
+import { Chip, Divider, Grid, Link, Stack } from '@mui/material'
 import { useSelector } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
 import { RootState } from '../store/reducers'
 import { Layout } from '../layout/Layout'
-import UploadFileButton from '../components/UploadFileButton'
+import UploadFileContainer from '../components/UploadFileContainer'
 import CustomSnackbar from '../components/Snackbar'
 import ImageOptimizer from '../services/image-optimizer'
 import { FileProcess, FileProcessStatus } from '../interfaces/file-process.interface'
@@ -18,25 +19,25 @@ import ImageProcessor from '../model/processors/image-processor'
 
 export const Home = () => {
   const config = useSelector((state: RootState) => state.config.config)
+  const compressions = useSelector((state: RootState) => state.imgService.compressions)
   const [selectedFiles, setSelectedFiles] = useState<FileProcess[]>([])
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false)
-  const [currentFileIndex, setCurrentFileIndex] = useState(0)
   const [showSettings, setShowSettings] = useState<boolean>(false)
 
   const handleFilesUploaded = (files: File[]) => {
     setSelectedFiles((prevFiles) => [
-      ...prevFiles,
       ...files.map((file) => ({
+        id: uuidv4(),
         file: file,
         status: FileProcessStatus.pending
-      }))
+      })),
+      ...prevFiles
     ])
   }
 
   const optimize = () => {
     if (!config.tinypngKey) {
       setSnackbarVisible(true)
-      return
     }
 
     const processors: AbstractImageProcessor[] = []
@@ -53,45 +54,65 @@ export const Home = () => {
     }
 
     const imageProcessor = new ImageProcessor(processors)
-
     const imageOptimizer = new ImageOptimizer(config.tinypngKey, config.replaceImage)
 
-    const processFile = (file: FileProcess, index: number) => {
-      setSelectedFiles((prevFiles) => {
-        const updatedFiles = [...prevFiles]
-        updatedFiles[index].status = FileProcessStatus.processing
-        return updatedFiles
-      })
-      imageOptimizer.optimizeImage(file.file, async (optimizedFile: File, size: number) => {
-        await imageProcessor.run(optimizedFile)
-        setSelectedFiles((prevFiles) => {
-          const updatedFiles = [...prevFiles]
-          updatedFiles[index].status = FileProcessStatus.processed
-          updatedFiles[index].optimizedSize = size
-          updatedFiles[index].optimizedFile = optimizedFile
-          return updatedFiles
-        })
-        setCurrentFileIndex((prevIndex) => prevIndex + 1)
-      })
+    const processFile = (file: FileProcess) => {
+      setSelectedFiles((prevFiles) =>
+        prevFiles.map((f) =>
+          f.id === file.id ? { ...f, status: FileProcessStatus.processing } : f
+        )
+      )
+
+      imageOptimizer.optimizeImage(
+        file.file,
+        async (optimizedFile: File, size: number) => {
+          await imageProcessor.run(optimizedFile)
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id
+                ? {
+                    ...f,
+                    status: FileProcessStatus.processed,
+                    optimizedSize: size,
+                    optimizedFile: optimizedFile
+                  }
+                : f
+            )
+          )
+        },
+        () => {
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id
+                ? {
+                    ...f,
+                    status: FileProcessStatus.error
+                  }
+                : f
+            )
+          )
+        }
+      )
     }
 
-    if (currentFileIndex < selectedFiles.length) {
-      processFile(selectedFiles[currentFileIndex], currentFileIndex)
-    }
+    selectedFiles
+      .filter((file) => file.status === FileProcessStatus.pending)
+      .forEach((file) => processFile(file))
   }
 
   useEffect(() => {
-    if (currentFileIndex < selectedFiles.length) {
+    if (selectedFiles.length > 0) {
       optimize()
     }
-  }, [currentFileIndex])
+  }, [selectedFiles.length])
 
   return (
     <Layout>
-      <Stack direction={'row'} mb={3} justifyContent={'flex-end'}>
+      <Stack direction={'row'} mb={3} justifyContent={'space-between'}>
+        <Chip label={`Compressions this month: ${compressions} images`} component="a" />
+
         <Link
           component={'button'}
-          variant="body2"
           onClick={() => {
             setShowSettings(!showSettings)
           }}
@@ -103,15 +124,12 @@ export const Home = () => {
       <Grid container direction={'row'} spacing={6}>
         <Grid item xs={showSettings ? 8 : 12}>
           <Stack spacing={4}>
-            <UploadFileButton handleFilesUploaded={handleFilesUploaded} />
+            <UploadFileContainer handleFilesUploaded={handleFilesUploaded} />
             <Stack divider={<Divider orientation="horizontal" flexItem />}>
-              {selectedFiles.map((file, index) => (
-                <ImageCard key={index} file={file} />
+              {selectedFiles.map((file) => (
+                <ImageCard key={file.id} file={file} />
               ))}
             </Stack>
-            <Button disabled={!selectedFiles.length} variant="contained" onClick={optimize}>
-              Optimize
-            </Button>
           </Stack>
         </Grid>
         {showSettings && (
