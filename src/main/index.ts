@@ -7,7 +7,15 @@ import axios from 'axios'
 import fs from 'fs'
 import sharp from 'sharp'
 
+if (process.env.NODE_ENV === 'test') {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  import('wdio-electron-service/main')
+}
+
 function createWindow(): void {
+  const isTest = process.env.NODE_ENV === 'test'
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -17,7 +25,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: !isTest
     }
   })
 
