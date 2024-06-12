@@ -1,5 +1,7 @@
 name: ci
 on: [push,pull_request]
+permissions:
+  contents: write
 jobs:
   test:
     name: Node ${{ matrix.node }} / ${{ matrix.os }}
@@ -20,3 +22,5 @@ jobs:
       - run: npm install cross-env --save-dev
       - run: npm run build:test
       - run: npm run test
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
