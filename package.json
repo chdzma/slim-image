@@ -19,7 +19,7 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
     "prepare": "husky",
-    "build:test": "cross-env NODE_ENV=test npm run build:unpack",
+    "build:test": "cross-env NODE_ENV=test npm run build:linux",
     "wdio": "wdio run wdio.conf.ts",
     "test": "npm run wdio"
   },
