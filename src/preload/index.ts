@@ -1,6 +1,12 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
+if (process.env.NODE_ENV === 'test') {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  import('wdio-electron-service/preload')
+}
+
 // Custom APIs for renderer
 const api = {}
 

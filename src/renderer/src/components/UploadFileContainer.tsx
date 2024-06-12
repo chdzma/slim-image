@@ -50,34 +50,32 @@ export default function UploadFileContainer({ handleFilesUploaded }: UploadFileC
   }
 
   return (
-    <div>
-      <Box
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        sx={{
-          border: isDragging ? '2px dashed #5BE0E5' : '2px dashed #aaa',
-          padding: '20px',
-          borderRadius: '5px',
-          textAlign: 'center',
-          cursor: 'pointer',
-          bgcolor: isDragging ? '#001718' : 'inherit'
-        }}
+    <Box
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      sx={{
+        border: isDragging ? '2px dashed #5BE0E5' : '2px dashed #aaa',
+        padding: '20px',
+        borderRadius: '5px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        bgcolor: isDragging ? '#001718' : 'inherit'
+      }}
+    >
+      <Button
+        id="uploadFileBtn"
+        role={undefined}
+        variant="contained"
+        tabIndex={-1}
+        startIcon={<CloudUploadIcon />}
       >
-        <Button
-          component="label"
-          role={undefined}
-          variant="contained"
-          tabIndex={-1}
-          startIcon={<CloudUploadIcon />}
-        >
-          Upload file
-          <VisuallyHiddenInput onChange={handleFileSelect} type="file" multiple />
-        </Button>
-        <Typography variant="body1" mt={2}>
-          or drag and drop files here
-        </Typography>
-      </Box>
-    </div>
+        Upload file
+        <VisuallyHiddenInput onChange={handleFileSelect} type="file" multiple />
+      </Button>
+      <Typography variant="body1" mt={2}>
+        or drag and drop files here
+      </Typography>
+    </Box>
   )
 }
