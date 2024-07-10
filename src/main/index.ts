@@ -14,8 +14,6 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 function createWindow(): void {
-  const isTest = process.env.NODE_ENV === 'test'
-
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -25,7 +23,7 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: !isTest
+      sandbox: false
     }
   })
 
