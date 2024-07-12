@@ -5,7 +5,6 @@ import icon from '../../resources/icon.png?asset'
 import { readConfig, saveConfig } from './config'
 import axios from 'axios'
 import fs from 'fs'
-import sharp from 'sharp'
 
 if (process.env.NODE_ENV === 'test') {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -84,17 +83,6 @@ app.whenReady().then(() => {
 
   ipcMain.on('set-config', (_event, config) => {
     saveConfig(config)
-  })
-
-  ipcMain.handle('convert-image', async (_event, { fileBuffer, format, outputFileName }) => {
-    try {
-      console.log(outputFileName)
-      await sharp(fileBuffer).toFormat(format).toFile(outputFileName)
-      return outputFileName
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
   })
 
   createWindow()

@@ -1,22 +1,15 @@
-import { AbstractImageProcessor } from '../../interfaces/image-processor.abstract'
+import { AbstractImageProcessor, ConvertToType } from '../../interfaces/image-processor.abstract'
 
 class WebpImageProcessor extends AbstractImageProcessor {
-  async process(file: File): Promise<any> {
-    const { arrayBuffer, fileNameWithoutExtension, filePath } = await this.readFile(file)
-    const outputFileName = `${filePath}${fileNameWithoutExtension}.webp`
-
-    try {
-      const result = await window.electron.ipcRenderer.invoke('convert-image', {
-        fileBuffer: arrayBuffer,
-        format: 'webp',
-        outputFileName: outputFileName
+  async process(file: File, imageUrl: string): Promise<any> {
+    this.convertImageTo(ConvertToType.webp, imageUrl)
+      .then((convertResponse) => {
+        const path = this.getPath(file, ConvertToType.webp)
+        this.saveFile(path, convertResponse.data)
       })
-
-      return result
-    } catch (error) {
-      console.error('Error processing image to JPEG:', error)
-      throw error
-    }
+      .catch((error) => {
+        console.log(error)
+      })
   }
 }
 

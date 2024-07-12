@@ -7,10 +7,10 @@ class ImageProcessor {
     this.processors = processors
   }
 
-  async run(file: File) {
+  async run(file: File, imageUrl: string) {
     for (let index = 0; index < this.processors.length; index++) {
       const processor = this.processors[index]
-      await processor.process(file)
+      await processor.process(file, imageUrl)
     }
   }
 }

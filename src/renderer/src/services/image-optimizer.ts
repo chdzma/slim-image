@@ -4,6 +4,7 @@ import { setData } from '../store/reducers/imgServiceSlice'
 class ImageOptimizer {
   private apiKey: string
   private replaceImage: boolean
+  private urlImage: string = ''
 
   constructor(apiKey: string, replaceImage = false) {
     this.apiKey = apiKey
@@ -57,7 +58,7 @@ class ImageOptimizer {
 
   public optimizeImage(
     file: File,
-    onFinish: (optimizedFile: File, size: number) => void,
+    onFinish: (optimizedFile: File, size: number, imageUrl: string) => void,
     onError: () => void
   ): void {
     this.readFileAsArrayBuffer(file)
@@ -67,6 +68,7 @@ class ImageOptimizer {
       .then((uploadResponse) => {
         store.dispatch(setData({ compressions: uploadResponse.headers['compression-count'] }))
         if (uploadResponse.data.output && uploadResponse.data.output.url) {
+          this.urlImage = uploadResponse.data.output.url
           return this.downloadOptimizedImage(uploadResponse.data.output.url)
         } else {
           throw new Error('Failed to get optimized image URL')
@@ -87,7 +89,8 @@ class ImageOptimizer {
           enumerable: false,
           configurable: false
         })
-        onFinish(optimizedFile, blob.size)
+        console.log('otpimized');
+        onFinish(optimizedFile, blob.size, this.urlImage)
       })
       .catch((error) => {
         onError()

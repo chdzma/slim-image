@@ -42,15 +42,15 @@ export const Home = () => {
 
     const processors: AbstractImageProcessor[] = []
     if (config.convertToJpg) {
-      processors.push(new JpegImageProcessor())
+      processors.push(new JpegImageProcessor(config.tinypngKey))
     }
 
     if (config.convertToPng) {
-      processors.push(new PngImageProcessor())
+      processors.push(new PngImageProcessor(config.tinypngKey))
     }
 
     if (config.convertToWebp) {
-      processors.push(new WebpImageProcessor())
+      processors.push(new WebpImageProcessor(config.tinypngKey))
     }
 
     const imageProcessor = new ImageProcessor(processors)
@@ -65,8 +65,8 @@ export const Home = () => {
 
       imageOptimizer.optimizeImage(
         file.file,
-        async (optimizedFile: File, size: number) => {
-          await imageProcessor.run(optimizedFile)
+        async (optimizedFile: File, size: number, imageUrl: string) => {
+          await imageProcessor.run(optimizedFile, imageUrl)
           setSelectedFiles((prevFiles) =>
             prevFiles.map((f) =>
               f.id === file.id
