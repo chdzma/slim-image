@@ -89,7 +89,6 @@ class ImageOptimizer {
           enumerable: false,
           configurable: false
         })
-        console.log('otpimized');
         onFinish(optimizedFile, blob.size, this.urlImage)
       })
       .catch((error) => {
