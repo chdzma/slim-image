@@ -14,7 +14,7 @@ const imageServiceSlice = createSlice({
   reducers: {
     setData: (state, action: PayloadAction<ImageServiceData>) => {
       state.compressions = action.payload.compressions
-    },
+    }
   }
 })
 

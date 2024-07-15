@@ -56,43 +56,43 @@ export const Home = () => {
     const imageProcessor = new ImageProcessor(processors)
     const imageOptimizer = new ImageOptimizer(config.tinypngKey, config.replaceImage)
 
-    const processFile = (file: FileProcess) => {
-      setSelectedFiles((prevFiles) =>
-        prevFiles.map((f) =>
-          f.id === file.id ? { ...f, status: FileProcessStatus.processing } : f
+    const processFile = async (file: FileProcess) => {
+      try {
+        setSelectedFiles((prevFiles) =>
+          prevFiles.map((f) =>
+            f.id === file.id ? { ...f, status: FileProcessStatus.processing } : f
+          )
         )
-      )
 
-      imageOptimizer.optimizeImage(
-        file.file,
-        async (optimizedFile: File, size: number, imageUrl: string) => {
-          await imageProcessor.run(optimizedFile, imageUrl)
+        const result = await imageOptimizer.optimizeImage(file.file)
+
+        if (result) {
+          await imageProcessor.run(result.optimizedFile, result.urlImage)
+
           setSelectedFiles((prevFiles) =>
             prevFiles.map((f) =>
               f.id === file.id
                 ? {
                     ...f,
                     status: FileProcessStatus.processed,
-                    optimizedSize: size,
-                    optimizedFile: optimizedFile
+                    optimizedSize: result.size,
+                    optimizedFile: result.optimizedFile
                   }
                 : f
             )
           )
-        },
-        () => {
+        } else {
           setSelectedFiles((prevFiles) =>
-            prevFiles.map((f) =>
-              f.id === file.id
-                ? {
-                    ...f,
-                    status: FileProcessStatus.error
-                  }
-                : f
-            )
+            prevFiles.map((f) => (f.id === file.id ? { ...f, status: FileProcessStatus.error } : f))
           )
         }
-      )
+      } catch (error) {
+        console.error('Error processing file:', error)
+
+        setSelectedFiles((prevFiles) =>
+          prevFiles.map((f) => (f.id === file.id ? { ...f, status: FileProcessStatus.error } : f))
+        )
+      }
     }
 
     selectedFiles

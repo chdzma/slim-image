@@ -1,10 +1,15 @@
 import store from '@renderer/store/store'
 import { setData } from '../store/reducers/imgServiceSlice'
 
+export interface OptimizeImageResult {
+  optimizedFile: File
+  size: number
+  urlImage: string
+}
+
 class ImageOptimizer {
   private apiKey: string
   private replaceImage: boolean
-  private urlImage: string = ''
 
   constructor(apiKey: string, replaceImage = false) {
     this.apiKey = apiKey
@@ -56,18 +61,13 @@ class ImageOptimizer {
     return `${originalDirectory}/${optimizedFileName}`
   }
 
-  public async optimizeImage(
-    file: File,
-    onFinish: (optimizedFile: File, size: number, imageUrl: string) => void,
-    onError: () => void
-  ): Promise<any> {
+  public async optimizeImage(file: File): Promise<OptimizeImageResult | false> {
     try {
       const imageData = await this.readFileAsArrayBuffer(file)
       const uploadResponse = await this.uploadImage(imageData)
-      console.log(uploadResponse)
       store.dispatch(setData({ compressions: uploadResponse.headers['compression-count'] }))
       if (uploadResponse.data.output && uploadResponse.data.output.url) {
-        this.urlImage = uploadResponse.data.output.url
+        const urlImage = uploadResponse.data.output.url
         const optimizedImageData = await this.downloadOptimizedImage(uploadResponse.data.output.url)
         const optimizedFilePath = this.getOptimizedFilePath(file)
         this.saveFile(optimizedFilePath, optimizedImageData.data)
@@ -79,13 +79,14 @@ class ImageOptimizer {
           enumerable: false,
           configurable: false
         })
-        onFinish(optimizedFile, blob.size, this.urlImage)
+        const size = blob.size
+        return { optimizedFile, size, urlImage }
       } else {
         throw new Error('Failed to get optimized image URL')
       }
     } catch (error) {
-      onError()
       console.error('Error:', error)
+      return false
     }
   }
 }
