@@ -2,14 +2,9 @@ import { AbstractImageProcessor, ConvertToType } from '../../interfaces/image-pr
 
 class JpegImageProcessor extends AbstractImageProcessor {
   async process(file: File, imageUrl: string): Promise<any> {
-    this.convertImageTo(ConvertToType.jpg, imageUrl)
-      .then((convertResponse) => {
-        const path = this.getPath(file, ConvertToType.jpg)
-        this.saveFile(path, convertResponse.data)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    const convertResponse = await this.convertImageTo(ConvertToType.jpg, imageUrl)
+    const path = this.getPath(file, ConvertToType.jpg)
+    await this.saveFile(path, convertResponse.data)
   }
 }
 

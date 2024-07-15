@@ -72,8 +72,8 @@ app.whenReady().then(() => {
     try {
       fs.writeFileSync(filePath, Buffer.from(data))
       return { success: true }
-    } catch (err) {
-      return { success: false, error: err }
+    } catch (error) {
+      return { success: false, error: error }
     }
   })
 

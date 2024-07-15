@@ -101,9 +101,7 @@ export const Home = () => {
   }
 
   useEffect(() => {
-    if (selectedFiles.length > 0) {
-      optimize()
-    }
+    selectedFiles.length > 0 && optimize()
   }, [selectedFiles.length])
 
   return (

@@ -56,31 +56,21 @@ class ImageOptimizer {
     return `${originalDirectory}/${optimizedFileName}`
   }
 
-  public optimizeImage(
+  public async optimizeImage(
     file: File,
     onFinish: (optimizedFile: File, size: number, imageUrl: string) => void,
     onError: () => void
-  ): void {
-    this.readFileAsArrayBuffer(file)
-      .then((imageData) => {
-        return this.uploadImage(imageData)
-      })
-      .then((uploadResponse) => {
-        store.dispatch(setData({ compressions: uploadResponse.headers['compression-count'] }))
-        if (uploadResponse.data.output && uploadResponse.data.output.url) {
-          this.urlImage = uploadResponse.data.output.url
-          return this.downloadOptimizedImage(uploadResponse.data.output.url)
-        } else {
-          throw new Error('Failed to get optimized image URL')
-        }
-      })
-      .then((optimizedImageData) => {
+  ): Promise<any> {
+    try {
+      const imageData = await this.readFileAsArrayBuffer(file)
+      const uploadResponse = await this.uploadImage(imageData)
+      console.log(uploadResponse)
+      store.dispatch(setData({ compressions: uploadResponse.headers['compression-count'] }))
+      if (uploadResponse.data.output && uploadResponse.data.output.url) {
+        this.urlImage = uploadResponse.data.output.url
+        const optimizedImageData = await this.downloadOptimizedImage(uploadResponse.data.output.url)
         const optimizedFilePath = this.getOptimizedFilePath(file)
-        return this.saveFile(optimizedFilePath, optimizedImageData.data).then(() => {
-          return { optimizedFilePath, optimizedImageData }
-        })
-      })
-      .then(({ optimizedFilePath, optimizedImageData }) => {
+        this.saveFile(optimizedFilePath, optimizedImageData.data)
         const blob = new Blob([optimizedImageData.data], { type: file.type })
         const optimizedFile = new File([blob], file.name, { lastModified: file.lastModified })
         Object.defineProperty(optimizedFile, 'path', {
@@ -90,11 +80,13 @@ class ImageOptimizer {
           configurable: false
         })
         onFinish(optimizedFile, blob.size, this.urlImage)
-      })
-      .catch((error) => {
-        onError()
-        console.error('Error:', error)
-      })
+      } else {
+        throw new Error('Failed to get optimized image URL')
+      }
+    } catch (error) {
+      onError()
+      console.error('Error:', error)
+    }
   }
 }
 

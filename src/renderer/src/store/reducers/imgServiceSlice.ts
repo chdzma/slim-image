@@ -1,5 +1,3 @@
-// En un archivo llamado ImageServiceSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface ImageServiceData {
@@ -16,7 +14,7 @@ const imageServiceSlice = createSlice({
   reducers: {
     setData: (state, action: PayloadAction<ImageServiceData>) => {
       state.compressions = action.payload.compressions
-    }
+    },
   }
 })
 
